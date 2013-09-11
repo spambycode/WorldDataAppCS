@@ -68,8 +68,8 @@ namespace SetupProgram
             {
                 MD.StoreOneCountry(RD);
             }
-           
 
+            MD.CloseFile();
 
 
 

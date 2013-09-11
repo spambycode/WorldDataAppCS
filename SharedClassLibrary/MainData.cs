@@ -41,7 +41,7 @@ namespace SharedClassLibrary
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
         public MainData()
         {
-            mainDataFile = new FileStream("MainData.txt", FileMode.Truncate);
+            mainDataFile = new FileStream("MainData.txt", FileMode.Create);
             _sizeOfHeaderRec =(byte)_headerRec.Length;
             _sizeOfDataRec = (byte)(_id.Length + _code.Length + _name.Length + _continent.Length 
                              + _region.Length + _surfaceArea.Length +_yearOfIndep.Length 
@@ -52,16 +52,10 @@ namespace SharedClassLibrary
         public bool StoreOneCountry(RawData RD)
         {
 
-            _id              = StringToFixedCharArray(RD.ID, _id.Length);
-            _code            = StringToFixedCharArray(RD.CODE, _code.Length);
-            _name            = StringToFixedCharArray(RD.NAME, _name.Length);
-            _continent       = StringToFixedCharArray(RD.CONTINENT, _continent.Length);
-            _region          = StringToFixedCharArray(RD.REGION, _region.Length);
-            _surfaceArea     = StringToFixedCharArray(RD.SURFACEAREA, _surfaceArea.Length);
-            _population      = StringToFixedCharArray(RD.POPULATION, _population.Length);
-            _lifeExpectancy  = StringToFixedCharArray(RD.LIFEEXPECTANCY, _lifeExpectancy.Length);
-          
-            int byteOffSet = CalculateByteOffSet(_id);
+            InitalizeFixLengthVaraibles(RD);
+
+            int RRN = CalculateRRN(RD.ID);
+            int byteOffSet = CalculateByteOffSet(RRN);
 
             if(RecordIsFilled(byteOffSet))
             {
@@ -76,6 +70,10 @@ namespace SharedClassLibrary
 
         }
 
+        public void CloseFile()
+        {
+            mainDataFile.Close();
+        }
 
         //**************************** PRIVATE METHODS *****************************
 
@@ -85,14 +83,25 @@ namespace SharedClassLibrary
         /// </summary>
         /// <param name="RRN">An ID to what record that needs to be obtained</param>
         /// <returns>offset to file positions</returns>
-        private int CalculateByteOffSet(char[] RRN)
+        private int CalculateByteOffSet(int RRN)
         {
 
-            int rrn = Int32.Parse(RRN.ToString());
+            
 
-            return _sizeOfHeaderRec + ((rrn - 1) * _sizeOfDataRec);
+            return _sizeOfHeaderRec + ((RRN - 1) * _sizeOfDataRec);
         }
 
+        //--------------------------------------------------------------------------
+        /// <summary>
+        /// Gives the RRN to where the information needs to be stored to stored or 
+        /// queried
+        /// </summary>
+        /// <param name="id">Id to calculate the RRN of the document</param>
+        /// <returns></returns>
+        private int CalculateRRN(string id)
+        {
+            return Int32.Parse(id);
+        }
 
         //--------------------------------------------------------------------------
         /// <summary>
@@ -105,7 +114,7 @@ namespace SharedClassLibrary
             byte[] Data = new Byte[_sizeOfDataRec];   //Data being read from file
 
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
-            mainDataFile.Read(Data, 0, _sizeOfDataRec);
+            mainDataFile.Read(Data, 0, Data.Length);
 
             if (Data[0] == 0)
                 return false;
@@ -123,26 +132,52 @@ namespace SharedClassLibrary
         private void WriteOneCountry(int byteOffSet)
         {
             mainDataFile.Seek(0, SeekOrigin.Begin);
-            _headerRec = headerCount.ToString().ToCharArray(0, 3);
-            
-            mainDataFile.Write(Encoding.ASCII.GetBytes(_headerRec), 0, _headerRec.Length);
+            _headerRec = headerCount.ToString().PadLeft(_headerRec.Length, '0').ToCharArray();
+
+            WriteOneRecord(_headerRec);
+            if(mainDataFile.Length < byteOffSet)
+                mainDataFile.SetLength(byteOffSet);
 
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
-
-            string input = String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}", _id, _code, 
-                _name, _continent, _region, _surfaceArea, _yearOfIndep, _population, _lifeExpectancy);
-
-            mainDataFile.Write(Encoding.ASCII.GetBytes(input), 0, _sizeOfDataRec);
+            //Write the information to the maindata file
+            WriteOneRecord(_id);
+            WriteOneRecord(_code);
+            WriteOneRecord(_name);
+            WriteOneRecord(_continent);
+            WriteOneRecord(_region);
+            WriteOneRecord(_surfaceArea);
+            WriteOneRecord(_yearOfIndep);
+            WriteOneRecord(_population);
+            WriteOneRecord(_lifeExpectancy);
 
         }
 
 
-
-        private void FixLengthVaraibles(RawData RD)
+        //-----------------------------------------------------------------------------
+        /// <summary>
+        /// Initalizes all the varaibles that require a fixed length
+        /// </summary>
+        /// <param name="RD">Class that holds strings at random lengths</param>
+        private void InitalizeFixLengthVaraibles(RawData RD)
         {
             _id = RD.ID.PadLeft(_id.Length, '0').ToCharArray();
-            _code = RD.CODE.PadLeft(_code.Length, '0').ToCharArray();
+            _code = RD.CODE.PadLeft(_code.Length, ' ').ToCharArray();
+            _name = RD.NAME.PadRight(_name.Length, ' ').ToCharArray();
+            _continent = RD.CONTINENT.PadRight(_continent.Length, ' ').ToCharArray();
+            _region = RD.REGION.PadRight(_region.Length, ' ').ToCharArray();
+            _surfaceArea = RD.SURFACEAREA.PadLeft(_surfaceArea.Length, '0').ToCharArray();
+            _yearOfIndep = RD.YEAROFINDEP.PadLeft(_yearOfIndep.Length, '0').ToCharArray();
+            _population = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray();
 
+            //Check this (needs to be XX.X or X.XX)
+            _lifeExpectancy = RD.LIFEEXPECTANCY.PadLeft(_lifeExpectancy.Length, '0').ToCharArray();
+
+
+        }
+
+        private void WriteOneRecord(char[] input)
+        {
+            mainDataFile.Write(Encoding.ASCII.GetBytes(input), 0, input.Length);
         }
 
     }
