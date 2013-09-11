@@ -46,7 +46,7 @@ namespace SetupProgram
         public static void Main(string[] args)
         {
             Console.WriteLine("OK, starting SetupProgram");
-
+            
             // Detect whether this program is being run by AutoTesterUtility,
             //      or manually by developer & fix fileNameSuffixes accordingly.
             //      (for RawData*, NameIndexBackup*).
