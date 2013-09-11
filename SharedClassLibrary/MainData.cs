@@ -41,7 +41,7 @@ namespace SharedClassLibrary
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
         public MainData()
         {
-            mainDataFile = new FileStream("MainData.txt", FileMode.CreateNew);
+            mainDataFile = new FileStream("MainData.txt", FileMode.Truncate);
             _sizeOfHeaderRec =(byte)_headerRec.Length;
             _sizeOfDataRec = (byte)(_id.Length + _code.Length + _name.Length + _continent.Length 
                              + _region.Length + _surfaceArea.Length +_yearOfIndep.Length 
@@ -52,17 +52,14 @@ namespace SharedClassLibrary
         public bool StoreOneCountry(RawData RD)
         {
 
-            _id             = RD.ID.ToCharArray();
-            _code           = RD.CODE.ToCharArray();
-            _name           = RD.NAME.ToCharArray();
-            _continent      = RD.CONTINENT.ToCharArray();
-            _region         = RD.REGION.ToCharArray();
-            _surfaceArea    = RD.SURFACEAREA.ToCharArray();
-            _population     = RD.POPULATION.ToCharArray();
-            _lifeExpectancy = RD.LIFEEXPECTANCY.ToCharArray();
-
-            string temp = String.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8}", 
-                            _id, _code, _continent, _region, _surfaceArea, _population, _lifeExpectancy);
+            _id              = StringToFixedCharArray(RD.ID, _id.Length);
+            _code            = StringToFixedCharArray(RD.CODE, _code.Length);
+            _name            = StringToFixedCharArray(RD.NAME, _name.Length);
+            _continent       = StringToFixedCharArray(RD.CONTINENT, _continent.Length);
+            _region          = StringToFixedCharArray(RD.REGION, _region.Length);
+            _surfaceArea     = StringToFixedCharArray(RD.SURFACEAREA, _surfaceArea.Length);
+            _population      = StringToFixedCharArray(RD.POPULATION, _population.Length);
+            _lifeExpectancy  = StringToFixedCharArray(RD.LIFEEXPECTANCY, _lifeExpectancy.Length);
           
             int byteOffSet = CalculateByteOffSet(_id);
 
@@ -136,6 +133,15 @@ namespace SharedClassLibrary
                 _name, _continent, _region, _surfaceArea, _yearOfIndep, _population, _lifeExpectancy);
 
             mainDataFile.Write(Encoding.ASCII.GetBytes(input), 0, _sizeOfDataRec);
+
+        }
+
+
+
+        private void FixLengthVaraibles(RawData RD)
+        {
+            _id = RD.ID.PadLeft(_id.Length, '0').ToCharArray();
+            _code = RD.CODE.PadLeft(_code.Length, '0').ToCharArray();
 
         }
 

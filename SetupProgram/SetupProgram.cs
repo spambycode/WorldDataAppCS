@@ -61,11 +61,12 @@ namespace SetupProgram
             }
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-            SharedClassLibrary.RawData RD = new RawData(fileNameSuffix);
+            SharedClassLibrary.RawData RD = new RawData("RawData.csv");
+            SharedClassLibrary.MainData MD = new MainData();
 
             while (RD.ReadOneCountry() != true)
             {
-
+                MD.StoreOneCountry(RD);
             }
            
 
