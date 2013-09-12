@@ -126,15 +126,31 @@ namespace SharedClassLibrary
         private bool RecordIsFilled(int byteOffSet)
         {
             byte[] Data = new Byte[_sizeOfDataRec];   //Data being read from file
+            string inFileName = "";
+            string inFileId     = "";
 
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
             mainDataFile.Read(Data, 0, Data.Length);
 
-            if (Data[0] == 0)
-                return false;
+            if(Data[0] != 0)  //If there is already data there in the file, a duplicate was found
+            {
+
+                //Get the name and ID of the information found in the file
+                inFileName = Encoding.UTF8.GetString(Data)
+                                          .Substring(_id.Length + _code.Length, _name.Length).Trim();
+
+                inFileId = Encoding.UTF8.GetString(Data)
+                                        .Substring(0, _id.Length).Trim();
+
+                //Write a nice little error log msg to the file.
+                WriteToLog("**Error: ID "  + new string(_id) + 
+                           " Not inserted (ID " + inFileId + " belongs to " + inFileName + ")");
+
+                return true;
+            }
             
 
-            return true;
+            return false;
         }
 
 
@@ -176,17 +192,17 @@ namespace SharedClassLibrary
         /// <param name="RD">Class that holds strings at random lengths</param>
         private void InitializeFixLengthVaraibles(RawData RD)
         {
-            _id          = RD.ID.PadLeft(_id.Length, '0').ToCharArray();
-            _code        = RD.CODE.PadLeft(_code.Length, ' ').ToCharArray();
-            _name        = RD.NAME.PadRight(_name.Length, ' ').ToCharArray();
-            _continent   = RD.CONTINENT.PadRight(_continent.Length, ' ').ToCharArray();
-            _region      = RD.REGION.PadRight(_region.Length, ' ').ToCharArray();
-            _surfaceArea = RD.SURFACEAREA.PadLeft(_surfaceArea.Length, '0').ToCharArray();
-            _yearOfIndep = RD.YEAROFINDEP.PadLeft(_yearOfIndep.Length, '0').ToCharArray();
-            _population  = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray();
+            _id          = RD.ID.PadLeft(_id.Length, '0').ToCharArray(0, _id.Length);
+            _code        = RD.CODE.PadLeft(_code.Length, ' ').ToCharArray(0, _code.Length);
+            _name        = RD.NAME.PadRight(_name.Length, ' ').ToCharArray(0, _name.Length);
+            _continent   = RD.CONTINENT.PadRight(_continent.Length, ' ').ToCharArray(0, _continent.Length);
+            _region      = RD.REGION.PadRight(_region.Length, ' ').ToCharArray(0, _region.Length);
+            _surfaceArea = RD.SURFACEAREA.PadLeft(_surfaceArea.Length, '0').ToCharArray(0, _surfaceArea.Length);
+            _yearOfIndep = RD.YEAROFINDEP.PadLeft(_yearOfIndep.Length, '0').ToCharArray(0, _yearOfIndep.Length);
+            _population  = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray(0, _yearOfIndep.Length);
 
             //Check this (needs to be XX.X or X.XX)
-            _lifeExpectancy = RD.LIFEEXPECTANCY.PadLeft(_lifeExpectancy.Length, '0').ToCharArray();
+            _lifeExpectancy = RD.LIFEEXPECTANCY.PadLeft(_lifeExpectancy.Length, '0').ToCharArray(0, _lifeExpectancy.Length);
 
 
         }
@@ -211,7 +227,9 @@ namespace SharedClassLibrary
         {
             try
             {
-                new StreamWriter("Log.txt", true).WriteLine(msg);
+                var logFile = new StreamWriter("Log.txt", true);
+                logFile.WriteLine(msg);
+                logFile.Close();
             }
             catch (Exception e)
             {

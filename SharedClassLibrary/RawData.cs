@@ -90,7 +90,10 @@ namespace SharedClassLibrary
         {
             try
             {
-                new StreamWriter("Log.txt", true).WriteLine(msg);
+                var logFile  = new StreamWriter("Log.txt", true);
+                logFile.WriteLine(msg);
+                logFile.Close();
+
             }catch (Exception e)
             {
                 Console.WriteLine(e.Message);

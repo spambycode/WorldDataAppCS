@@ -34,13 +34,12 @@ namespace WorldDataAppCS
             //      - N's to limit how many records to display during testing
             // The dataFileSuffix is used for RawData*.csv, MainData*.bin,
             //      NameIndexBackup*.bin, CodeIndexBackup*.bin
-            string[] dataFileSuffix = { "RawData.csv ", "" };
+            string[] dataFileSuffix = { ".csv", "28.csv" };
             string[] transFileSuffix = { "", "All" };
             string[] nRecToShow = { "All", "60" };
 
             //Delete the SINGLE output Log.txt file (if it exists)
             DeleteFile("Log.txt");
-            CreateFile("Log.txt");
             for (int i = 0; i < dataFileSuffix.Length; i++)
             {
                 //Delete 3 other output files (if they exist)
@@ -60,19 +59,6 @@ namespace WorldDataAppCS
             if (File.Exists(fileName))
             {
                 File.Delete(fileName);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private static bool CreateFile(String fileName)
-        {
-            if(File.Exists(fileName) == false)
-            {
-                File.Create(fileName);
                 return true;
             }
             else
