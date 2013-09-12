@@ -13,7 +13,8 @@ namespace SharedClassLibrary
     public class RawData
     {
         //**************************** PRIVATE DECLARATIONS ************************
-        private StreamReader fileReader;
+        private StreamReader rawDataFile;
+        private string filename;
 
         //**************************** PUBLIC GET/SET METHODS **********************
 
@@ -33,7 +34,9 @@ namespace SharedClassLibrary
         {
             try
             {
-                fileReader = new StreamReader(filename);
+                this.filename = filename;
+                rawDataFile = new StreamReader(filename);
+                WriteToLog("Open " + filename + " File");
             }catch(Exception e)
             {
                 Console.WriteLine(e.Message);
@@ -45,9 +48,9 @@ namespace SharedClassLibrary
 
         public bool ReadOneCountry()
         {
-            if (fileReader.EndOfStream != true)
+            if (rawDataFile.EndOfStream != true)
             {
-                var line = fileReader.ReadLine();
+                var line = rawDataFile.ReadLine();
                 var split = line.Split(',');
 
 
@@ -69,11 +72,30 @@ namespace SharedClassLibrary
             return true;
         }
 
-
+        public void CloseFile()
+        {
+            rawDataFile.Close();
+            WriteToLog("Closed " + filename + " file");
+        }
 
 
         //**************************** PRIVATE METHODS *****************************
 
+        //--------------------------------------------------------------------------
+        /// <summary>
+        /// Appends to the log file
+        /// </summary>
+        /// <param name="msg">Message wanted to be displayed in the log file</param>
+        private void WriteToLog(string msg)
+        {
+            try
+            {
+                new StreamWriter("Log.txt", true).WriteLine(msg);
+            }catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
 
     }
 }

@@ -57,7 +57,7 @@ namespace SetupProgram
             }
             else
             {
-                fileNameSuffix = "Tester";
+                fileNameSuffix = "RawData.csv";
             }
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -18,10 +18,11 @@ namespace SharedClassLibrary
     {
         //**************************** PRIVATE DECLARATIONS ************************
 
-        private FileStream mainDataFile;
+        private FileStream mainDataFile;                //RandomAccess File structure
+        private string fileName;                        //Holds the file name of main data
         private int headerCount = 0;                    //Counts how many recorders
-        private int _sizeOfHeaderRec;
-        private int _sizeOfDataRec;
+        private int _sizeOfHeaderRec;                   //Size of the reader record
+        private int _sizeOfDataRec;                     //Size of all the data fields
         private char[] _headerRec = new char[3];        //Header rec of the document
         private char[] _id = new char[3];               //ID of record
         private char[] _code = new char[3];             //Country code
@@ -41,7 +42,13 @@ namespace SharedClassLibrary
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
         public MainData()
         {
-            mainDataFile = new FileStream("MainData.txt", FileMode.Create);
+            //Open and create a new file
+            fileName = "MainData.txt";
+            mainDataFile = new FileStream(fileName, FileMode.Create);
+            WriteToLog("Opened " + fileName + " File");
+
+
+            //Calculate sizes for RandomAccess byte offset
             _sizeOfHeaderRec =_headerRec.Length;
             _sizeOfDataRec = _id.Length + _code.Length + _name.Length + _continent.Length 
                              + _region.Length + _surfaceArea.Length +_yearOfIndep.Length 
@@ -82,6 +89,7 @@ namespace SharedClassLibrary
         public void CloseFile()
         {
             mainDataFile.Close();
+            WriteToLog("Closed " + fileName + " File");
         }
 
         //**************************** PRIVATE METHODS *****************************
@@ -192,6 +200,23 @@ namespace SharedClassLibrary
         private void WriteOneRecord(char[] input)
         {
             mainDataFile.Write(Encoding.ASCII.GetBytes(input), 0, input.Length);
+        }
+
+        //--------------------------------------------------------------------------
+        /// <summary>
+        /// Appends to the log file
+        /// </summary>
+        /// <param name="msg">Message wanted to be displayed in the log file</param>
+        private void WriteToLog(string msg)
+        {
+            try
+            {
+                new StreamWriter("Log.txt", true).WriteLine(msg);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
     }
