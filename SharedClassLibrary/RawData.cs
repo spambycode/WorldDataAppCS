@@ -31,7 +31,14 @@ namespace SharedClassLibrary
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
         public RawData(string filename)
         {
-            fileReader = new StreamReader(filename);
+            try
+            {
+                fileReader = new StreamReader(filename);
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(0);
+            }
         }
         //**************************** PUBLIC SERVICE METHODS **********************
 

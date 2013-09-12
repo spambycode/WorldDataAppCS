@@ -20,8 +20,8 @@ namespace SharedClassLibrary
 
         private FileStream mainDataFile;
         private int headerCount = 0;                    //Counts how many recorders
-        private byte _sizeOfHeaderRec;
-        private byte _sizeOfDataRec;
+        private int _sizeOfHeaderRec;
+        private int _sizeOfDataRec;
         private char[] _headerRec = new char[3];        //Header rec of the document
         private char[] _id = new char[3];               //ID of record
         private char[] _code = new char[3];             //Country code
@@ -42,17 +42,22 @@ namespace SharedClassLibrary
         public MainData()
         {
             mainDataFile = new FileStream("MainData.txt", FileMode.Create);
-            _sizeOfHeaderRec =(byte)_headerRec.Length;
-            _sizeOfDataRec = (byte)(_id.Length + _code.Length + _name.Length + _continent.Length 
+            _sizeOfHeaderRec =_headerRec.Length;
+            _sizeOfDataRec = _id.Length + _code.Length + _name.Length + _continent.Length 
                              + _region.Length + _surfaceArea.Length +_yearOfIndep.Length 
-                             + _population.Length + _lifeExpectancy.Length);
+                             + _population.Length + _lifeExpectancy.Length;
         }
         //**************************** PUBLIC SERVICE METHODS **********************
 
+        /// <summary>
+        /// Stores one country to the main data file
+        /// </summary>
+        /// <param name="RD">Raw data class that holds parsed values</param>
+        /// <returns>The boolean value of whether the main data file has a dup</returns>
         public bool StoreOneCountry(RawData RD)
         {
 
-            InitalizeFixLengthVaraibles(RD);
+            InitializeFixLengthVaraibles(RD);
 
             int RRN = CalculateRRN(RD.ID);
             int byteOffSet = CalculateByteOffSet(RRN);
@@ -70,6 +75,10 @@ namespace SharedClassLibrary
 
         }
 
+        //-------------------------------------------------------------------------
+        /// <summary>
+        /// Closes the main data file 
+        /// </summary>
         public void CloseFile()
         {
             mainDataFile.Close();
@@ -85,9 +94,6 @@ namespace SharedClassLibrary
         /// <returns>offset to file positions</returns>
         private int CalculateByteOffSet(int RRN)
         {
-
-            
-
             return _sizeOfHeaderRec + ((RRN - 1) * _sizeOfDataRec);
         }
 
@@ -97,7 +103,7 @@ namespace SharedClassLibrary
         /// queried
         /// </summary>
         /// <param name="id">Id to calculate the RRN of the document</param>
-        /// <returns></returns>
+        /// <returns>The RRN of the main data file</returns>
         private int CalculateRRN(string id)
         {
             return Int32.Parse(id);
@@ -138,7 +144,9 @@ namespace SharedClassLibrary
             if(mainDataFile.Length < byteOffSet)
                 mainDataFile.SetLength(byteOffSet);
 
+            //Move file pointer to new location
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
+
             //Write the information to the maindata file
             WriteOneRecord(_id);
             WriteOneRecord(_code);
@@ -155,25 +163,31 @@ namespace SharedClassLibrary
 
         //-----------------------------------------------------------------------------
         /// <summary>
-        /// Initalizes all the varaibles that require a fixed length
+        /// Initializes all the variables that require a fixed length
         /// </summary>
         /// <param name="RD">Class that holds strings at random lengths</param>
-        private void InitalizeFixLengthVaraibles(RawData RD)
+        private void InitializeFixLengthVaraibles(RawData RD)
         {
-            _id = RD.ID.PadLeft(_id.Length, '0').ToCharArray();
-            _code = RD.CODE.PadLeft(_code.Length, ' ').ToCharArray();
-            _name = RD.NAME.PadRight(_name.Length, ' ').ToCharArray();
-            _continent = RD.CONTINENT.PadRight(_continent.Length, ' ').ToCharArray();
-            _region = RD.REGION.PadRight(_region.Length, ' ').ToCharArray();
+            _id          = RD.ID.PadLeft(_id.Length, '0').ToCharArray();
+            _code        = RD.CODE.PadLeft(_code.Length, ' ').ToCharArray();
+            _name        = RD.NAME.PadRight(_name.Length, ' ').ToCharArray();
+            _continent   = RD.CONTINENT.PadRight(_continent.Length, ' ').ToCharArray();
+            _region      = RD.REGION.PadRight(_region.Length, ' ').ToCharArray();
             _surfaceArea = RD.SURFACEAREA.PadLeft(_surfaceArea.Length, '0').ToCharArray();
             _yearOfIndep = RD.YEAROFINDEP.PadLeft(_yearOfIndep.Length, '0').ToCharArray();
-            _population = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray();
+            _population  = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray();
 
             //Check this (needs to be XX.X or X.XX)
             _lifeExpectancy = RD.LIFEEXPECTANCY.PadLeft(_lifeExpectancy.Length, '0').ToCharArray();
 
 
         }
+
+        //-------------------------------------------------------------------------------
+        /// <summary>
+        /// Uses the write function in file stream to write a record to the main file
+        /// </summary>
+        /// <param name="input">Input wanted to write to file</param>
 
         private void WriteOneRecord(char[] input)
         {
