@@ -132,7 +132,7 @@ namespace SharedClassLibrary
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
             mainDataFile.Read(Data, 0, Data.Length);
 
-            if(Data[0] != 0)  //If there is already data there in the file, a duplicate was found
+            if(Data[0] != '\0')  //If there is already data there in the file, a duplicate was found
             {
 
                 //Get the name and ID of the information found in the file
@@ -192,6 +192,8 @@ namespace SharedClassLibrary
         /// <param name="RD">Class that holds strings at random lengths</param>
         private void InitializeFixLengthVaraibles(RawData RD)
         {
+            string lifeExp = "";
+
             _id          = RD.ID.PadLeft(_id.Length, '0').ToCharArray(0, _id.Length);
             _code        = RD.CODE.PadLeft(_code.Length, ' ').ToCharArray(0, _code.Length);
             _name        = RD.NAME.PadRight(_name.Length, ' ').ToCharArray(0, _name.Length);
@@ -201,8 +203,17 @@ namespace SharedClassLibrary
             _yearOfIndep = RD.YEAROFINDEP.PadLeft(_yearOfIndep.Length, '0').ToCharArray(0, _yearOfIndep.Length);
             _population  = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray(0, _yearOfIndep.Length);
 
-            //Check this (needs to be XX.X or X.XX)
-            _lifeExpectancy = RD.LIFEEXPECTANCY.PadLeft(_lifeExpectancy.Length, '0').ToCharArray(0, _lifeExpectancy.Length);
+            //Check this (needs to be XX.X or X.XX or null)
+            if(RD.LIFEEXPECTANCY.ToUpper().CompareTo("NULL") == 0)
+            {
+                lifeExp = RD.LIFEEXPECTANCY;
+            }
+            else
+            {
+                lifeExp = string.Format("{0:##.#}", Convert.ToDecimal(RD.LIFEEXPECTANCY));
+            }
+
+            _lifeExpectancy = lifeExp.ToCharArray();
 
 
         }
