@@ -64,7 +64,7 @@ namespace SetupProgram
             string FileName = "RawData" + fileNameSuffix;
 
             SharedClassLibrary.RawData RD = new RawData(FileName);
-            SharedClassLibrary.MainData MD = new MainData();
+            SharedClassLibrary.MainData MD = new MainData(true);
 
             while (RD.ReadOneCountry() != true)
             {

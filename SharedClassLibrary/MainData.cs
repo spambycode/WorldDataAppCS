@@ -36,15 +36,28 @@ namespace SharedClassLibrary
 
         //**************************** PUBLIC GET/SET METHODS **********************
 
-
+        
+        public int FileRecordCount
+        {
+            get
+            {
+                return headerCount;
+            }
+        }
 
 
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
-        public MainData()
+        public MainData(bool CreateNewFile)
         {
             //Open and create a new file
             fileName = "MainData.txt";
-            mainDataFile = new FileStream(fileName, FileMode.Create);
+
+            if (CreateNewFile)
+                mainDataFile = new FileStream(fileName, FileMode.Create);
+            else
+                mainDataFile = new FileStream(fileName, FileMode.OpenOrCreate);
+
+
             WriteToLog("Opened " + fileName + " File");
 
 
@@ -54,6 +67,7 @@ namespace SharedClassLibrary
                              + _region.Length + _surfaceArea.Length +_yearOfIndep.Length 
                              + _population.Length + _lifeExpectancy.Length;
         }
+
         //**************************** PUBLIC SERVICE METHODS **********************
 
         /// <summary>
@@ -80,6 +94,30 @@ namespace SharedClassLibrary
 
             return true;
 
+        }
+
+
+        //---------------------------------------------------------------------------
+        /// <summary>
+        /// Returns a formatted record with RRN to be printed
+        /// </summary>
+        /// <param name="RRN">Record location</param>
+        /// <returns>a formatted record that can be printed</returns>
+        public string GetFormattedRecord(int RRN)
+        {
+            byte  []record = ReadOneRecord(RRN);
+            string formatRecord = "";
+
+            if(record[0] != '\0')
+            {
+                formatRecord = string.Format("[{0}] {1}", RRN, Encoding.UTF8.GetString(record));   
+            }
+            else
+            {
+                formatRecord = string.Format("[{0}] EMPTY", RRN);
+            }
+
+            return formatRecord;
         }
 
         //-------------------------------------------------------------------------
@@ -151,6 +189,26 @@ namespace SharedClassLibrary
             
 
             return false;
+        }
+
+
+
+        //--------------------------------------------------------------------------
+        /// <summary>
+        /// Reads one block of data from the file based on the RRN
+        /// </summary>
+        /// <param name="RRN">Record location</param>
+        /// <returns>A string based on its RRN location in file</returns>
+        private byte []ReadOneRecord(int RRN)
+        {
+
+            byte[] recordData = new byte[_sizeOfDataRec];
+            int byteOffSet    = CalculateByteOffSet(RRN);
+
+            mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
+            mainDataFile.Read(recordData, 0, recordData.Length);
+
+            return recordData;
         }
 
 
