@@ -30,6 +30,19 @@ namespace SharedClassLibrary
         
 
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
+
+        public RawData(string[] recordSplit)
+        {
+            ID = recordSplit[0];
+            CODE = recordSplit[1];
+            NAME = recordSplit[2];
+            CONTINENT = recordSplit[3];
+            REGION = recordSplit[4];
+            SURFACEAREA = recordSplit[5];
+            YEAROFINDEP = recordSplit[6];
+            LIFEEXPECTANCY = recordSplit[7];
+        }
+
         public RawData(string filename)
         {
             try

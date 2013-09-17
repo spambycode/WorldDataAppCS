@@ -186,12 +186,34 @@ namespace SharedClassLibrary
         /// <summary>
         /// Erases a recorded by places a terminating character on the records place.
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">Record id</param>
         public void DeleteRecordByID(int id)
         {
             int byteOffSet = CalculateByteOffSet(CalculateRRN(id));
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
             mainDataFile.WriteByte(0);
+        }
+
+
+        //-------------------------------------------------------------------------
+        /// <summary>
+        /// Inserts a new record into the file
+        /// </summary>
+        /// <param name="record">A string with CSV style record</param>
+        /// <returns>true if value was stored correctly without error</returns>
+        public bool InsertRecord(string record)
+        {
+
+            var recordSplit = record.Split(',');
+
+            //Must of at least 9 records for everything to work
+            if(recordSplit.Length >= 9)
+            {
+                RawData RD = new RawData(recordSplit);
+                return StoreOneCountry(RD);
+            }
+
+            return false;
         }
 
         //**************************** PRIVATE METHODS *****************************
