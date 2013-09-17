@@ -102,15 +102,23 @@ namespace SharedClassLibrary
         /// Returns a formatted record with RRN to be printed
         /// </summary>
         /// <param name="RRN">Record location</param>
+        /// <param name="WithRRN">Add RRN with string</param>
         /// <returns>a formatted record that can be printed</returns>
-        public string GetFormattedRecord(int RRN)
+        public string GetFormattedRecord(int RRN, bool WithRRN)
         {
             byte  []record = ReadOneRecord(RRN);
             string formatRecord = "";
 
             if(record[0] != '\0')
             {
-                formatRecord = string.Format("[{0}] {1}", RRN, Encoding.UTF8.GetString(record));   
+                if (WithRRN)
+                {
+                    formatRecord = string.Format("[{0}] {1}", RRN, Encoding.UTF8.GetString(record));
+                }
+                else
+                {
+                    formatRecord = Encoding.UTF8.GetString(record);
+                }
             }
             else
             {
@@ -130,6 +138,62 @@ namespace SharedClassLibrary
             WriteToLog("Closed " + fileName + " File");
         }
 
+        //-------------------------------------------------------------------------
+        /// <summary>
+        /// Returns a recorded by ID
+        /// </summary>
+        /// <param name="id">ID of recorded requested</param>
+        /// <returns>Full string record that was requested</returns>
+        public string QueryByID(int id)
+        {
+            string recordReturn = "";
+            int RRN = CalculateRRN(id);
+            byte[] record = ReadOneRecord(id);
+
+
+            if(record[0] != '\0')
+            {
+                recordReturn = Encoding.UTF8.GetString(record);
+            }
+            else
+            {
+                recordReturn = string.Format("**ERROR: no country with id {0}", id);
+            }
+
+            return recordReturn;
+        }
+
+        //-------------------------------------------------------------------------------
+        /// <summary>
+        /// Gives a list of all recorders by ID
+        /// </summary>
+        /// <param name="id">An array of all ID's requested for</param>
+        /// <returns>A array of all found in file</returns>
+        public string []ListById(int []id)
+        {
+            string []recordList = new string[id.Length];
+
+            for (int i = 0; i < id.Length; i++ )
+            {
+                recordList[i] = QueryByID(id[i]);
+            }
+
+                return recordList;
+
+        }
+
+        //---------------------------------------------------------------------------
+        /// <summary>
+        /// Erases a recorded by places a terminating character on the records place.
+        /// </summary>
+        /// <param name="id"></param>
+        public void DeleteRecordByID(int id)
+        {
+            int byteOffSet = CalculateByteOffSet(CalculateRRN(id));
+            mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
+            mainDataFile.WriteByte(0);
+        }
+
         //**************************** PRIVATE METHODS *****************************
 
         //---------------------------------------------------------------------------
@@ -143,6 +207,18 @@ namespace SharedClassLibrary
             return _sizeOfHeaderRec + ((RRN - 1) * _sizeOfDataRec);
         }
 
+
+        //-------------------------------------------------------------------------
+        /// <summary>
+        /// Returns the RRN value of the given parameter
+        /// </summary>
+        /// <param name="id">ID of query record</param>
+        /// <returns></returns>
+        private int CalculateRRN(int id)
+        {
+            return id;
+        }
+
         //--------------------------------------------------------------------------
         /// <summary>
         /// Gives the RRN to where the information needs to be stored to stored or 
@@ -152,7 +228,7 @@ namespace SharedClassLibrary
         /// <returns>The RRN of the main data file</returns>
         private int CalculateRRN(string id)
         {
-            return Int32.Parse(id);
+            return CalculateRRN(Int32.Parse(id));
         }
 
         //--------------------------------------------------------------------------
@@ -192,6 +268,22 @@ namespace SharedClassLibrary
         }
 
 
+
+        //---------------------------------------------------------------------------
+        /// <summary>
+        /// Reads the top of the record file
+        /// </summary>
+        /// <returns>Returns the amount of records stored in file</returns>
+        private int ReadRecordCount()
+        {
+            byte[] header = new byte[3];
+
+            mainDataFile.Seek(0, SeekOrigin.Begin);
+            mainDataFile.Read(header, 0, header.Length);
+
+            return Int32.Parse(Encoding.UTF8.GetString(header));
+
+        }
 
         //--------------------------------------------------------------------------
         /// <summary>
