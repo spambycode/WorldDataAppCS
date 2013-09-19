@@ -11,6 +11,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 namespace SharedClassLibrary
 {
@@ -144,11 +145,11 @@ namespace SharedClassLibrary
         /// </summary>
         /// <param name="id">ID of recorded requested</param>
         /// <returns>Full string record that was requested</returns>
-        public string QueryByID(int id)
+        public string QueryByID(string queryID)
         {
             string recordReturn = "";
-            int RRN = CalculateRRN(id);
-            byte[] record = ReadOneRecord(id);
+            int RRN = CalculateRRN(Convert.ToInt32(queryID));
+            byte[] record = ReadOneRecord(RRN);
 
 
             if(record[0] != '\0')
@@ -157,7 +158,7 @@ namespace SharedClassLibrary
             }
             else
             {
-                recordReturn = string.Format("**ERROR: no country with id {0}", id);
+                recordReturn = string.Format("**ERROR: no country with id {0}", queryID);
             }
 
             return recordReturn;
@@ -167,18 +168,26 @@ namespace SharedClassLibrary
         /// <summary>
         /// Gives a list of all recorders by ID
         /// </summary>
-        /// <param name="id">An array of all ID's requested for</param>
-        /// <returns>A array of all found in file</returns>
-        public string []ListById(int []id)
+        /// <param name="queryIDList">A list of ID's that need to be queried</param>
+        /// <returns>An Array of non-error records</returns>
+        public string []ListById(string queryIDList)
         {
-            string []recordList = new string[id.Length];
+            string []splitStringIdList = queryIDList.Split(' ');  //Split the different ID's being used
+            List<string> recordList = new List<string>();         //List of valid non-error ID's.
+            string QueryRecord = "";                              //Query Result of a given ID
 
-            for (int i = 0; i < id.Length; i++ )
+            for (int i = 0; i < splitStringIdList.Length; i++)
             {
-                recordList[i] = QueryByID(id[i]);
+                QueryRecord = QueryByID(splitStringIdList[i]);
+
+                //Check for query error
+                if(QueryRecord.Contains("Error") == false)
+                {
+                    recordList.Add(QueryRecord);
+                }
             }
 
-                return recordList;
+                return recordList.ToArray();
 
         }
 
@@ -187,9 +196,9 @@ namespace SharedClassLibrary
         /// Erases a recorded by places a terminating character on the records place.
         /// </summary>
         /// <param name="id">Record id</param>
-        public void DeleteRecordByID(int id)
+        public void DeleteRecordByID(string queryID)
         {
-            int byteOffSet = CalculateByteOffSet(CalculateRRN(id));
+            int byteOffSet = CalculateByteOffSet(CalculateRRN(Convert.ToInt32(queryID)));
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
             mainDataFile.WriteByte(0);
         }

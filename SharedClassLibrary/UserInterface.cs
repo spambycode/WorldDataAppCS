@@ -66,6 +66,13 @@ namespace SharedClassLibrary
         }
 
 
+        //---------------------------------------------------------------------------
+        /// <summary>
+        /// Reads a line in transdata.
+        /// </summary>
+        /// <param name="query">Query data of what to return to calle</param>
+        /// <returns>returns EOF state</returns>
+
         public bool GetOneTransdata(out string query)
         {
             query = "";
@@ -77,6 +84,31 @@ namespace SharedClassLibrary
                 return false;
             }
             return true;
+        }
+
+
+        //---------------------------------------------------------------------------
+        /// <summary>
+        /// Close the files that where open during the start of the class
+        /// </summary>
+        /// <param name="closeLog">Close log file</param>
+        /// <param name="closeTransData">Close trans data file</param>
+        public void CloseFile(bool closeLog, bool closeTransData)
+        {
+            if (closeLog)
+                logFile.Close();
+            if (closeTransData)
+                transDataFile.Close();
+        }
+
+        //----------------------------------------------------------------------------
+        /// <summary>
+        /// Close all files open
+        /// </summary>
+        public void CloseFile()
+        {
+            logFile.Close();
+            transDataFile.Close();
         }
 
         //**************************** PRIVATE METHODS *****************************

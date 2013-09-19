@@ -17,7 +17,9 @@ namespace UserApp
             // <WRITE APPROPRIATE CODE HERE>
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-            int CommandCount = 0;
+            int CommandCount        = 0;
+            int ErrorCommandCount   = 0;
+            int SuccessCommandCount = 0;
             string command = "";
             SharedClassLibrary.UserInterface UI = new UserInterface(true, true);
             SharedClassLibrary.MainData MD = new MainData(false);
@@ -40,12 +42,15 @@ namespace UserApp
                         break;
 
                     default:
+                        Console.WriteLine("No Valid Command found");
                         break;
                 }
+
+                CommandCount++;
+
             }
 
-
-
+            UI.WriteToLog(string.Format("UserApp completed: {0} transactions handled", CommandCount));
 
 
         }
