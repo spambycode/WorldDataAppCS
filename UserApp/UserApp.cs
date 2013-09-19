@@ -27,16 +27,16 @@ namespace UserApp
                 switch(command.Substring(0, 2))
                 {
                     case "QI":
-                        MD.QueryByID(command);
+                        MD.QueryByID(QueryData(command));
                         break;
                     case "LI":
-                        MD.ListById(command);
+                        MD.ListById(QueryData(command));
                         break;
                     case "IN":
-                        MD.InsertRecord(command);
+                        MD.InsertRecord(QueryData(command));
                         break;
                     case "DI":
-                        MD.DeleteRecordByID(command);
+                        MD.DeleteRecordByID(QueryData(command));
                         break;
 
                     default:
@@ -51,6 +51,10 @@ namespace UserApp
         }
         //*********************** PRIVATE METHODS ********************************
 
+        private static string QueryData(string input)
+        {
+            return input.Substring(2);
+        }
 
 
 
