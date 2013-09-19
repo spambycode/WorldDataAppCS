@@ -20,24 +20,128 @@
 
 using System;
 using System.IO;
+using System.Text;
+using System.Collections.Generic;
 
 namespace PrettyPrintUtility
 {
     public class PrettyPrintUtility
     {
+        static FileStream mainDataFile;
+        static int _sizeOfHeaderRec = 3;
+        static int _sizeOfDataRec = 74;
+        static List<string> RecordList = new List<string>();
+
         public static void Main(string[] args)
         {
-            Console.WriteLine("OK, starting PrettyPrintUtility");
-
-            // Detect whether this program is being run by AutoTesterUtility,
-            //      or manually by developer & fix fileNameSuffix & N accordingly.
-            // <WRITE APPROPRIATE CODE HERE>
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
+            if (File.Exists("MainData.txt"))
+            {
+                mainDataFile = new FileStream("MainData.txt", FileMode.Open);
+                HandleDataFile();
+                PrintResults();
+            }
+            else
+            {
+                Console.WriteLine("Error MainData.txt does not exist!");
+            }
 
           
         }
+
+        private static void HandleDataFile()
+        {
+            int RecordCount = ReadHeaderRec();
+            int id = 1;
+            int RRN = 0;
+            byte[] QueryRecord;
+
+            for(int i = 0; i < RecordCount;)
+            {
+                RRN = CalculateRRN(id++);
+                QueryRecord = ReadOneRecord(RRN);
+                if(QueryRecord[0] != 0)
+                {
+                    RecordList.Add(Encoding.UTF8.GetString(QueryRecord));
+                    ++i;
+                }
+                else
+                {
+                    RecordList.Add(string.Format("[{0}]  Empty", RRN));
+                }
+            }
+
+        }
+
+
+        private static void PrintResults()
+        {
+            string Header = "[RRN]  ID  CODE  NAME\t\t\tCONTINENT" + 
+                            "\tREGION\t\tAREA\t\tINDEP\t\tPOPULATION\tL.EXP";
+
+            Console.WriteLine(Header);
+
+            foreach(string s in RecordList)
+            {
+                Console.WriteLine(s);
+            }
+        }
+
+        //-------------------------------------------------------------------------
+        /// <summary>
+        /// Returns the RRN value of the given parameter
+        /// </summary>
+        /// <param name="id">ID of query record</param>
+        /// <returns></returns>
+        private static int CalculateRRN(int id)
+        {
+            return id;
+        }
+
+        //--------------------------------------------------------------------------
+        /// <summary>
+        /// Gives the RRN to where the information needs to be stored to stored or 
+        /// queried
+        /// </summary>
+        /// <param name="id">Id to calculate the RRN of the document</param>
+        /// <returns>The RRN of the main data file</returns>
+        private static int CalculateRRN(string id)
+        {
+            return CalculateRRN(Int32.Parse(id));
+        }
+
+        //---------------------------------------------------------------------------
+        /// <summary>
+        /// Obtain the offset to where the file pointer needs to point
+        /// </summary>
+        /// <param name="RRN">An ID to what record that needs to be obtained</param>
+        /// <returns>offset to file positions</returns>
+        private static int CalculateByteOffSet(int RRN)
+        {
+            return _sizeOfHeaderRec + ((RRN - 1) * _sizeOfDataRec);
+        }
+
+        private static byte[] ReadOneRecord(int RRN)
+        {
+
+            byte[] recordData = new byte[_sizeOfDataRec];
+            int byteOffSet = CalculateByteOffSet(RRN);
+
+            mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
+            mainDataFile.Read(recordData, 0, recordData.Length);
+  
+            return recordData;
+        }
+
+        private static int ReadHeaderRec()
+        {
+            byte[] recordData = new byte[_sizeOfHeaderRec];
+
+            mainDataFile.Seek(0, SeekOrigin.Begin);
+            mainDataFile.Read(recordData, 0, recordData.Length);
+
+            return Convert.ToInt32(Encoding.UTF8.GetString(recordData));
+        }
+
+
     }
 }
