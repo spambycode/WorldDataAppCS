@@ -28,17 +28,16 @@ namespace PrettyPrintUtility
     public class PrettyPrintUtility
     {
         static FileStream mainDataFile;
-        static StreamWriter prettyPrintFile;
         static int _sizeOfHeaderRec = 3;
         static int _sizeOfDataRec = 71;
         static private string _id;               //ID of record
         static private string _code;             //Country code
-        static private string _name;            //Name of country
-        static private string _continent;       //What continent the country is located
-        static private string _region;          //What region the country is located
+        static private string _name;             //Name of country
+        static private string _continent;        //What continent the country is located
+        static private string _region;           //What region the country is located
         static private string _surfaceArea;      //Size of the country
         static private string _yearOfIndep;      //What year they went independent
-        static private string _population;      //Total population of the country
+        static private string _population;       //Total population of the country
         static private string _lifeExpectancy;   //The average time someone is alive in the country
         static List<string> RecordList = new List<string>();
 
@@ -46,7 +45,6 @@ namespace PrettyPrintUtility
         {
             if (File.Exists("MainData.txt"))
             {
-                prettyPrintFile = new StreamWriter("PrettyPrint.txt", false);
                 mainDataFile = new FileStream("MainData.txt", FileMode.Open);
                 HandleDataFile();
                 PrintResults();
@@ -55,22 +53,26 @@ namespace PrettyPrintUtility
             {
                 Console.WriteLine("Error MainData.txt does not exist!");
             }
-
-            CloseFile();
           
         }
 
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Handles the main data file and its records
+        /// </summary>
         private static void HandleDataFile()
         {
-            int RecordCount = ReadHeaderRec();
-            int id = 1;
-            int RRN = 0;
-            byte[] QueryRecord;
+            int RecordCount = ReadHeaderRec(); //Amount of records in file
+            int id = 1;                        //Starting point in searching for ID's
+            int RRN = 0;                       //RRN of file location
+            byte[] QueryRecord;                //Record that was returned
 
             for(int i = 0; i < RecordCount;)
             {
                 RRN = CalculateRRN(id++);
                 QueryRecord = ReadOneRecord(RRN);
+
+                //Check for empty record
                 if(QueryRecord[0] != 0)
                 {
                     RecordList.Add(FormatRecord(Encoding.UTF8.GetString(QueryRecord)));
@@ -78,30 +80,22 @@ namespace PrettyPrintUtility
                 }
                 else
                 {
-                    RecordList.Add(string.Format("[{0}]".PadRight(7, ' ') +  "Empty", Convert.ToString(RRN).PadLeft(3, '0')));
+                    RecordList.Add(string.Format("[{0}]".PadRight(7, ' ') +  
+                                "Empty", Convert.ToString(RRN).PadLeft(3, '0')));
                 }
             }
 
         }
 
-
-        private static void PrintResults()
-        {
-            string Header = FormatHeader();
-
-            prettyPrintFile.WriteLine(Header);
-
-            foreach(string s in RecordList)
-            {
-                prettyPrintFile.WriteLine(s);
-            }
-
-        }
+        /*/------------------------------------------------------------------------------
+        /// <summary>
+        /// Close the file used with this class
+        /// </summary>
 
         private static void CloseFile()
         {
             prettyPrintFile.Close();
-        }
+        }*/
 
         //-------------------------------------------------------------------------
         /// <summary>
@@ -137,6 +131,13 @@ namespace PrettyPrintUtility
             return _sizeOfHeaderRec + ((RRN - 1) * _sizeOfDataRec);
         }
 
+
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Reads one record using the RRN
+        /// </summary>
+        /// <param name="RRN">File Location of the record</param>
+        /// <returns>An array in byte form that came from the maind ata file</returns>
         private static byte[] ReadOneRecord(int RRN)
         {
 
@@ -152,6 +153,12 @@ namespace PrettyPrintUtility
             return recordData;
         }
 
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Reads the header that contains the amount of records inside
+        /// </summary>
+        /// <returns>Record amount number</returns>
+
         private static int ReadHeaderRec()
         {
             byte[] recordData = new byte[_sizeOfHeaderRec];
@@ -162,6 +169,12 @@ namespace PrettyPrintUtility
             return Convert.ToInt32(Encoding.UTF8.GetString(recordData));
         }
 
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Formates the string to de aligned with its header columns
+        /// </summary>
+        /// <param name="record">record from main data</param>
+        /// <returns>formatted string ready to be used</returns>
         private static string FormatRecord(string record)
         {
             int stringPos = 0;
@@ -188,8 +201,8 @@ namespace PrettyPrintUtility
 
 
             string t = "[" + _id + "]".PadRight(3, ' ') +
-                        _id.PadRight(6, ' ') +
-                        _code.PadRight(7, ' ')+
+                        _id.PadRight(4, ' ') +
+                        _code.PadRight(5, ' ')+
                         _name.PadRight(20, ' ') +
                         _continent.PadRight(18)+
                         _region.PadRight(15, ' ') +
@@ -198,18 +211,23 @@ namespace PrettyPrintUtility
                         _population.PadRight(13, ' ') +
                         _lifeExpectancy;
 
-            return t;//string.Format("[{0}]\t{1,2}{2,2}{3,2}{4,10}{5:N,5}{6,5}{7,5}{8:N,10}{9,4}", 
-                //_id, _id, _code,_name, _continent, _region, _surfaceArea, _yearOfIndep, _population, _lifeExpectancy);
+            return t;
         }
 
+
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Formates the header to be displayed
+        /// </summary>
+        /// <returns>A ready to use string aligned in its columns</returns>
         private static string FormatHeader()
         {
 
             string t = "[RRN]".PadRight(7, ' ') +
-                        "ID".PadRight(6, ' ') +
-                        "CODE".PadRight(7, ' ') +
+                        "ID".PadRight(4, ' ') +
+                        "CODE".PadRight(5, ' ') +
                         "NAME".PadRight(20, ' ') +
-                        "CONTINENT".PadRight(18) +
+                        "CONTINENT".PadRight(18, ' ') +
                         "REGION".PadRight(15, ' ') +
                         "AREA".PadRight(15, ' ') +
                         "INDEP".PadRight(9, ' ') +
@@ -217,9 +235,25 @@ namespace PrettyPrintUtility
                         "L.EXP";
 
             return t;
-            //return string.Format("[RRN]\tID\tCODE\tNAME\t\t\tCONTINENT\t\tREGION\t\t\tAREA\t\tINDEP\t\tPOPULATION\tL.EXP");
         }
 
+
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Print the results from the formatted text
+        /// </summary>
+        private static void PrintResults()
+        {
+            string Header = FormatHeader();
+
+            Console.WriteLine(Header);
+
+            foreach (string s in RecordList)
+            {
+                Console.WriteLine(s);
+            }
+
+        }
 
     }
 }

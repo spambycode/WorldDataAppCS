@@ -381,6 +381,13 @@ namespace SharedClassLibrary
             _continent   = RD.CONTINENT.PadRight(_continent.Length, ' ').ToCharArray(0, _continent.Length);
             _region      = RD.REGION.PadRight(_region.Length, ' ').ToCharArray(0, _region.Length);
             _surfaceArea = RD.SURFACEAREA.PadLeft(_surfaceArea.Length, '0').ToCharArray(0, _surfaceArea.Length);
+
+
+            if(RD.YEAROFINDEP.Contains("-"))
+            {
+                RD.YEAROFINDEP = RD.YEAROFINDEP.Replace('-', '0');
+            }
+
             _yearOfIndep = RD.YEAROFINDEP.PadLeft(_yearOfIndep.Length, '0').ToCharArray(0, _yearOfIndep.Length);
             _population  = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray(0, _population.Length);
 
@@ -391,7 +398,7 @@ namespace SharedClassLibrary
             }
             else
             {
-                lifeExp = string.Format("{0:##.#}", Convert.ToDecimal(RD.LIFEEXPECTANCY));
+                lifeExp = string.Format("{0:N1}", Convert.ToDecimal(RD.LIFEEXPECTANCY));
             }
 
             _lifeExpectancy = lifeExp.ToCharArray();
