@@ -48,12 +48,19 @@ namespace PrettyPrintUtility
                 mainDataFile = new FileStream("MainData.txt", FileMode.Open);
                 HandleDataFile();
                 PrintResults();
+                CloseFile();
+
             }
             else
             {
                 Console.WriteLine("Error MainData.txt does not exist!");
             }
           
+        }
+
+        private static void CloseFile()
+        {
+            mainDataFile.Close();
         }
 
         //------------------------------------------------------------------------------
@@ -86,16 +93,6 @@ namespace PrettyPrintUtility
             }
 
         }
-
-        /*/------------------------------------------------------------------------------
-        /// <summary>
-        /// Close the file used with this class
-        /// </summary>
-
-        private static void CloseFile()
-        {
-            prettyPrintFile.Close();
-        }*/
 
         //-------------------------------------------------------------------------
         /// <summary>
@@ -137,7 +134,7 @@ namespace PrettyPrintUtility
         /// Reads one record using the RRN
         /// </summary>
         /// <param name="RRN">File Location of the record</param>
-        /// <returns>An array in byte form that came from the maind ata file</returns>
+        /// <returns>An array in byte form that came from the main data file</returns>
         private static byte[] ReadOneRecord(int RRN)
         {
 
@@ -146,7 +143,6 @@ namespace PrettyPrintUtility
 
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
             mainDataFile.Read(recordData, 0, recordData.Length);
-
 
 
 
@@ -188,7 +184,7 @@ namespace PrettyPrintUtility
             _continent      = record.Substring(stringPos, 11).Trim();
             stringPos       += 11;
             _region         = record.Substring(stringPos, 10).Trim();
-            stringPos       += _region.Length;
+            stringPos       += 10;
             _surfaceArea    = record.Substring(stringPos, 8).Trim();
             stringPos       += 8;
             _yearOfIndep    = record.Substring(stringPos, 5).Trim();
@@ -244,14 +240,18 @@ namespace PrettyPrintUtility
         /// </summary>
         private static void PrintResults()
         {
-            string Header = FormatHeader();
+            StreamWriter logFile = new StreamWriter("Log.txt", true);
 
-            Console.WriteLine(Header);
+            logFile.WriteLine(FormatHeader());
 
             foreach (string s in RecordList)
             {
-                Console.WriteLine(s);
+                logFile.WriteLine(s);
             }
+
+            logFile.WriteLine("**********End Of Pretty Print Utility**********");
+
+            logFile.Close();
 
         }
 

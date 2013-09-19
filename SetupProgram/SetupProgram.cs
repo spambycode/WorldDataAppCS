@@ -45,11 +45,10 @@ namespace SetupProgram
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("OK, starting SetupProgram");
-            
-            // Detect whether this program is being run by AutoTesterUtility,
-            //      or manually by developer & fix fileNameSuffixes accordingly.
-            //      (for RawData*, NameIndexBackup*).
+            int RecordCount   = 0;
+            int RecordSuccess = 0;
+            int RecordError   = 0;
+
             string fileNameSuffix;
             if (args.Length > 0)
             {
@@ -65,13 +64,28 @@ namespace SetupProgram
 
             SharedClassLibrary.RawData RD = new RawData(FileName);
             SharedClassLibrary.MainData MD = new MainData(true);
+            SharedClassLibrary.UserInterface UI = new UserInterface();
 
             while (RD.ReadOneCountry() != true)
             {
-                MD.StoreOneCountry(RD);
+                if(MD.StoreOneCountry(RD))
+                {
+                    RecordSuccess++;
+                }
+                else
+                {
+                    RecordError++;
+                }
+
+                RecordCount++;
             }
 
+            UI.WriteToLog(string.Format("Setup complete: {0} Total records processed ({1} Successes and {2} Errors) ", 
+                            RecordCount, RecordSuccess, RecordError));
+
+            UI.CloseFile();
             MD.CloseFile();
+            RD.CloseFile();
 
 
 

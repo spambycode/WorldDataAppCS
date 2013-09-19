@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace SharedClassLibrary
 {
-    public class MainData
+    public class MainData : UserInterface
     {
         //**************************** PRIVATE DECLARATIONS ************************
 
@@ -37,29 +37,16 @@ namespace SharedClassLibrary
 
         //**************************** PUBLIC GET/SET METHODS **********************
 
-        
-        public int FileRecordCount
-        {
-            get
-            {
-                return headerCount;
-            }
-        }
-
 
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
         public MainData(bool CreateNewFile)
         {
             //Open and create a new file
             fileName = "MainData.txt";
-
-            if (CreateNewFile)
-                mainDataFile = new FileStream(fileName, FileMode.Create);
-            else
-                mainDataFile = new FileStream(fileName, FileMode.OpenOrCreate);
-
-
+            
+            mainDataFile = new FileStream(fileName, FileMode.OpenOrCreate);
             WriteToLog("Opened " + fileName + " File");
+
 
 
             //Calculate sizes for RandomAccess byte offset
