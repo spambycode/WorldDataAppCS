@@ -57,11 +57,11 @@ namespace SetupProgram
             }
             else
             {
-                fileNameSuffix = ".csv";
+                fileNameSuffix = "";
             }
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-            string FileName = "RawData" + fileNameSuffix;
+            string FileName = "RawData" + fileNameSuffix + ".csv";
 
             SharedClassLibrary.RawData RD = new RawData(FileName);
             SharedClassLibrary.MainData MD = new MainData(true);

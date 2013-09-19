@@ -77,11 +77,14 @@ namespace SharedClassLibrary
         {
             query = "";
 
-            if(transDataFile.EndOfStream == false)
+            if (transDataFile != null)
             {
-                query = transDataFile.ReadLine();
+                if (transDataFile.EndOfStream == false)
+                {
+                    query = transDataFile.ReadLine();
 
-                return false;
+                    return false;
+                }
             }
             return true;
         }

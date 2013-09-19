@@ -50,6 +50,7 @@ namespace UserApp
 
             }
 
+            MD.CloseFile();
             UI.WriteToLog(string.Format("UserApp completed: {0} transactions handled", CommandCount));
 
 

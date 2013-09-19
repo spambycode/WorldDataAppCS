@@ -382,7 +382,7 @@ namespace SharedClassLibrary
             _region      = RD.REGION.PadRight(_region.Length, ' ').ToCharArray(0, _region.Length);
             _surfaceArea = RD.SURFACEAREA.PadLeft(_surfaceArea.Length, '0').ToCharArray(0, _surfaceArea.Length);
             _yearOfIndep = RD.YEAROFINDEP.PadLeft(_yearOfIndep.Length, '0').ToCharArray(0, _yearOfIndep.Length);
-            _population  = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray(0, _yearOfIndep.Length);
+            _population  = RD.POPULATION.PadLeft(_population.Length, '0').ToCharArray(0, _population.Length);
 
             //Check this (needs to be XX.X or X.XX or null)
             if(RD.LIFEEXPECTANCY.ToUpper().CompareTo("NULL") == 0)
