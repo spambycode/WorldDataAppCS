@@ -41,7 +41,8 @@ namespace SharedClassLibrary
             REGION = recordSplit[4];
             SURFACEAREA = recordSplit[5];
             YEAROFINDEP = recordSplit[6];
-            LIFEEXPECTANCY = recordSplit[7];
+            POPULATION = recordSplit[7];
+            LIFEEXPECTANCY = recordSplit[8];
         }
 
         public RawData(UserInterface LogFile, string filename)

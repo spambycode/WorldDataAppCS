@@ -38,9 +38,11 @@ namespace UserApp
 
             while(UI.GetOneTransdata(out command) == false)
             {
+                UI.WriteToLog(command);
+
                 switch(command.Substring(0, 2))
                 {
-                    case "QI":
+                    case "QI":   
                         MD.QueryByID(QueryData(command));
                         break;
                     case "LI":
@@ -64,6 +66,7 @@ namespace UserApp
 
             MD.CloseFile();
             UI.WriteToLog(string.Format("UserApp completed: {0} transactions handled", CommandCount));
+            UI.CloseFile(true, true);
 
 
         }
@@ -71,7 +74,7 @@ namespace UserApp
 
         private static string QueryData(string input)
         {
-            return input.Substring(2);
+            return input.Substring(3);
         }
 
 

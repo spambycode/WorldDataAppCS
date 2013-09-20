@@ -83,9 +83,10 @@ namespace SetupProgram
             UI.WriteToLog(string.Format("Setup complete: {0} Total records processed ({1} Successes and {2} Errors) ", 
                             RecordCount, RecordSuccess, RecordError));
 
-            UI.CloseFile();
+            
             MD.CloseFile();
             RD.CloseFile();
+            UI.CloseFile(true, false);
 
 
 

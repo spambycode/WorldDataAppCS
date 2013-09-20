@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace SharedClassLibrary
 {
-    public class MainData : UserInterface
+    public class MainData
     {
         //**************************** PRIVATE DECLARATIONS ************************
 
@@ -136,13 +136,23 @@ namespace SharedClassLibrary
         public void QueryByID(string queryID)
         {
             string recordReturn = "";
-            int RRN = CalculateRRN(Convert.ToInt32(queryID));
-            byte[] record = ReadOneRecord(RRN);
+            int ID = Convert.ToInt32(queryID.Trim());
+            int RRN = 0;
+            byte[] record = { 0 };
 
-
-            if(record[0] != '\0')
+            if (ID > 0 && ID <= 300)
             {
-                recordReturn = Encoding.UTF8.GetString(record);
+                RRN = CalculateRRN(ID);
+                record = ReadOneRecord(RRN);
+
+                if (record[0] != '\0')
+                {
+                    recordReturn = FormatRecord(Encoding.UTF8.GetString(record));
+                }
+                else
+                {
+                    recordReturn = string.Format("**ERROR: no country with id {0}", queryID);
+                }
             }
             else
             {
@@ -160,11 +170,12 @@ namespace SharedClassLibrary
         /// <returns>An Array of non-error records</returns>
         public void ListById()
         {
-            List<string> RecordList = new List<string>();
+            byte[] QueryRecord;                //Record that was returned
             int headerCount = ReadHeaderRec();
             int id = 1;
             int RRN = 0;
-            byte[] QueryRecord;                //Record that was returned
+
+            _LogFile.WriteToLog(FormatHeader());
 
             for(int i = 0; i < headerCount;)
             {
@@ -173,11 +184,9 @@ namespace SharedClassLibrary
 
                 if(QueryRecord[0] != 0)
                 {
-                    RecordList.Add(FormatRecord(Encoding.UTF8.GetString(QueryRecord)));
+                    _LogFile.WriteToLog(FormatRecord(Encoding.UTF8.GetString(QueryRecord)));
                     ++i;
                 }
-
-                
 
             }
 
@@ -193,9 +202,38 @@ namespace SharedClassLibrary
         /// <param name="id">Record id</param>
         public void DeleteRecordByID(string queryID)
         {
-            int byteOffSet = CalculateByteOffSet(CalculateRRN(Convert.ToInt32(queryID)));
-            mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
-            mainDataFile.WriteByte(0);
+            byte[] data = new byte[_sizeOfDataRec];
+            int ID = Convert.ToInt32(queryID);
+
+
+            if (ID > 0 && ID <= 900)
+            {
+
+                int byteOffSet = CalculateByteOffSet(CalculateRRN(ID));
+
+
+                mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
+                mainDataFile.Read(data, 0, data.Length);
+
+                if (data[0] != '\0')
+                {
+                    string name = Encoding.UTF8.GetString(data)
+                                            .Substring(_id.Length + _code.Length, _name.Length).Trim();
+
+                    mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
+                    mainDataFile.WriteByte(0);
+
+                    _LogFile.WriteToLog("OK, " + name + "\t\tDeleted");
+                }
+                else
+                {
+                    _LogFile.WriteToLog("Sorry no country with id " + queryID);
+                }
+            }
+            else
+            {
+                _LogFile.WriteToLog("Sorry no country with id " + queryID);
+            }
         }
 
 
@@ -205,7 +243,7 @@ namespace SharedClassLibrary
         /// </summary>
         /// <param name="record">A string with CSV style record</param>
         /// <returns>true if value was stored correctly without error</returns>
-        public bool InsertRecord(string record)
+        public void InsertRecord(string record)
         {
 
             var recordSplit = record.Split(',');
@@ -214,10 +252,14 @@ namespace SharedClassLibrary
             if(recordSplit.Length >= 9)
             {
                 RawData RD = new RawData(recordSplit);
-                return StoreOneCountry(RD);
+                StoreOneCountry(RD);
+                _LogFile.WriteToLog("IN : OK, " + recordSplit[2] + " Has been added to MainData");
+            }
+            else
+            {
+                _LogFile.WriteToLog("IN : Wrong input was found");
             }
 
-            return false;
         }
 
         //**************************** PRIVATE METHODS *****************************
@@ -283,8 +325,8 @@ namespace SharedClassLibrary
                                         .Substring(0, _id.Length).Trim();
 
                 //Write a nice little error log msg to the file.
-                WriteToLog("**Error: ID "  + new string(_id) + 
-                           " Not inserted (ID " + inFileId + " belongs to " + inFileName + ")");
+                _LogFile.WriteToLog("**Error: ID "  + new string(_id) + 
+                                        " Not inserted (ID " + inFileId + " belongs to " + inFileName + ")");
 
                 return true;
             }
@@ -342,8 +384,7 @@ namespace SharedClassLibrary
 
 
 
-            string t = "[" + _id + "]".PadRight(3, ' ') +
-                        id.PadRight(4, ' ') +
+            string t =  id.PadRight(4, ' ') +
                         code.PadRight(5, ' ') +
                         name.PadRight(20, ' ') +
                         continent.PadRight(18) +
@@ -352,6 +393,28 @@ namespace SharedClassLibrary
                         yearOfIndep.PadRight(9, ' ') +
                         population.PadRight(13, ' ') +
                         lifeExpectancy;
+
+            return t;
+        }
+
+        //----------------------------------------------------------------------------
+        /// <summary>
+        /// Returns a header that is formated to show all data that is inputted
+        /// </summary>
+        /// <returns>Header string</returns>
+
+        private string FormatHeader()
+        {
+
+            string t =  "ID".PadRight(4, ' ') +
+                        "CODE".PadRight(5, ' ') +
+                        "NAME".PadRight(20, ' ') +
+                        "CONTINENT".PadRight(18, ' ') +
+                        "REGION".PadRight(15, ' ') +
+                        "AREA".PadRight(15, ' ') +
+                        "INDEP".PadRight(9, ' ') +
+                        "POPULATION".PadRight(13, ' ') +
+                        "L.EXP";
 
             return t;
         }

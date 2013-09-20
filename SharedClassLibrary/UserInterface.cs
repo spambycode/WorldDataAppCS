@@ -86,30 +86,28 @@ namespace SharedClassLibrary
         }
 
 
-        //---------------------------------------------------------------------------
-        /// <summary>
-        /// Close the files that where open during the start of the class
-        /// </summary>
-        /// <param name="closeLog">Close log file</param>
-        /// <param name="closeTransData">Close trans data file</param>
-        public void CloseFile(bool closeLog, bool closeTransData)
-        {
-            if (closeLog)
-                logFile.Close();
-            if (closeTransData)
-                transDataFile.Close();
-        }
 
         //----------------------------------------------------------------------------
         /// <summary>
-        /// Close all files open
+        /// Close open files used
         /// </summary>
-        public void CloseFile()
+        /// <param name="CloseTransData">Trans data file</param>
+        /// <param name="CloseLog">Close opened log file</param>
+        public void CloseFile(bool CloseLog, bool CloseTransData)
         {
-            WriteToLog("Log File Closed");
-            WriteToLog("Trans Data File Closed");
-            logFile.Close();
-            transDataFile.Close();
+            if(CloseTransData && transDataFile != null)
+            {
+                WriteToLog("Trans Data File Closed");
+                transDataFile.Close();
+                transDataFile = null;
+            }
+
+            if(CloseLog)
+            {
+                WriteToLog("Log File Closed"); ;
+                logFile.Close();
+                logFile = null;
+            }
         }
 
         //**************************** PRIVATE METHODS *****************************
