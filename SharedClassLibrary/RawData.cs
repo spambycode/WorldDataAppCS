@@ -14,6 +14,7 @@ namespace SharedClassLibrary
     {
         //**************************** PRIVATE DECLARATIONS ************************
         private StreamReader rawDataFile;
+        private UserInterface logFile;
         private string filename;
 
         //**************************** PUBLIC GET/SET METHODS **********************
@@ -43,13 +44,15 @@ namespace SharedClassLibrary
             LIFEEXPECTANCY = recordSplit[7];
         }
 
-        public RawData(string filename)
+        public RawData(UserInterface LogFile, string filename)
         {
             try
             {
+                logFile = LogFile;
+
                 this.filename = filename;
                 rawDataFile = new StreamReader(filename);
-                WriteToLog("Open " + filename + " File");
+                logFile.WriteToLog("Open " + filename + " File");
             }catch(Exception e)
             {
                 Console.WriteLine(e.Message);
@@ -88,30 +91,11 @@ namespace SharedClassLibrary
         public void CloseFile()
         {
             rawDataFile.Close();
-            WriteToLog("Closed " + filename + " file");
+            logFile.WriteToLog("Closed " + filename + " file");
         }
 
 
         //**************************** PRIVATE METHODS *****************************
-
-        //--------------------------------------------------------------------------
-        /// <summary>
-        /// Appends to the log file
-        /// </summary>
-        /// <param name="msg">Message wanted to be displayed in the log file</param>
-        private void WriteToLog(string msg)
-        {
-            try
-            {
-                var logFile  = new StreamWriter("Log.txt", true);
-                logFile.WriteLine(msg);
-                logFile.Close();
-
-            }catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
 
     }
 }

@@ -19,31 +19,27 @@ namespace SharedClassLibrary
 
 
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
-        public UserInterface(bool OpenLog, bool OpenTrans)
+        public UserInterface(bool OpenLog, bool OpenTrans, string TransFileName = "Transdata.txt")
         {
             Console.WriteLine("OK, UserInterface object created");
 
             if(OpenLog)
             {
                 logFile = new StreamWriter("Log.txt", true);
+                WriteToLog("Log File Open");
             }
 
-            if(OpenTrans)
+            if (OpenTrans)
             {
-                if(File.Exists("Transdata.txt"))
-                {
-                    transDataFile = new StreamReader("Transdata.txt");
-                }
-                else
-                {
-                    Console.WriteLine("Error no file called Transdata.txt");
-                }
+                transDataFile = new StreamReader(TransFileName);
+                WriteToLog("Trans Data File Open");
             }
         }
 
         public UserInterface()
         {
-
+            logFile = new StreamWriter("Log.txt", true);
+            WriteToLog("Log File Open");
         }
         //**************************** PUBLIC SERVICE METHODS **********************
 
@@ -110,6 +106,8 @@ namespace SharedClassLibrary
         /// </summary>
         public void CloseFile()
         {
+            WriteToLog("Log File Closed");
+            WriteToLog("Trans Data File Closed");
             logFile.Close();
             transDataFile.Close();
         }

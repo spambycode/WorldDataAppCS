@@ -62,9 +62,9 @@ namespace SetupProgram
 
             string FileName = "RawData" + fileNameSuffix + ".csv";
 
-            SharedClassLibrary.RawData RD = new RawData(FileName);
-            SharedClassLibrary.MainData MD = new MainData(true);
             SharedClassLibrary.UserInterface UI = new UserInterface();
+            SharedClassLibrary.RawData RD = new RawData(UI, FileName);
+            SharedClassLibrary.MainData MD = new MainData(UI);
 
             while (RD.ReadOneCountry() != true)
             {

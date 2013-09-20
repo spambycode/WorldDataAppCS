@@ -18,11 +18,23 @@ namespace UserApp
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
             int CommandCount        = 0;
-            int ErrorCommandCount   = 0;
-            int SuccessCommandCount = 0;
+            string transFileSuffix = "";
+            string transFileName = "TransData";
             string command = "";
-            SharedClassLibrary.UserInterface UI = new UserInterface(true, true);
-            SharedClassLibrary.MainData MD = new MainData(false);
+
+            if(args.Length > 0)
+            {
+                transFileSuffix = args[0];
+            }
+            else
+            {
+                transFileSuffix = "";
+            }
+
+            transFileName += transFileSuffix + ".txt";
+
+            SharedClassLibrary.UserInterface UI = new UserInterface(true, true, transFileName);
+            SharedClassLibrary.MainData MD = new MainData(UI);
 
             while(UI.GetOneTransdata(out command) == false)
             {
@@ -32,7 +44,7 @@ namespace UserApp
                         MD.QueryByID(QueryData(command));
                         break;
                     case "LI":
-                        MD.ListById(QueryData(command));
+                        MD.ListById();
                         break;
                     case "IN":
                         MD.InsertRecord(QueryData(command));

@@ -20,6 +20,7 @@ namespace SharedClassLibrary
         //**************************** PRIVATE DECLARATIONS ************************
 
         private FileStream mainDataFile;                //RandomAccess File structure
+        private UserInterface _LogFile;                  //Log file Access
         private string fileName;                        //Holds the file name of main data
         private int headerCount = 0;                    //Counts how many recorders
         private int _sizeOfHeaderRec;                   //Size of the reader record
@@ -39,13 +40,14 @@ namespace SharedClassLibrary
 
 
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
-        public MainData(bool CreateNewFile)
+        public MainData(UserInterface LogInterFace)
         {
             //Open and create a new file
             fileName = "MainData.txt";
-            
+
+            _LogFile = LogInterFace;
             mainDataFile = new FileStream(fileName, FileMode.OpenOrCreate);
-            WriteToLog("Opened " + fileName + " File");
+            _LogFile.WriteToLog("Opened " + fileName + " File");
 
 
 
@@ -123,7 +125,7 @@ namespace SharedClassLibrary
         public void CloseFile()
         {
             mainDataFile.Close();
-            WriteToLog("Closed " + fileName + " File");
+            _LogFile.WriteToLog("Closed " + fileName + " File");
         }
 
         //-------------------------------------------------------------------------
@@ -131,8 +133,7 @@ namespace SharedClassLibrary
         /// Returns a recorded by ID
         /// </summary>
         /// <param name="id">ID of recorded requested</param>
-        /// <returns>Full string record that was requested</returns>
-        public string QueryByID(string queryID)
+        public void QueryByID(string queryID)
         {
             string recordReturn = "";
             int RRN = CalculateRRN(Convert.ToInt32(queryID));
@@ -148,7 +149,7 @@ namespace SharedClassLibrary
                 recordReturn = string.Format("**ERROR: no country with id {0}", queryID);
             }
 
-            return recordReturn;
+            _LogFile.WriteToLog(recordReturn);
         }
 
         //-------------------------------------------------------------------------------
@@ -157,26 +158,33 @@ namespace SharedClassLibrary
         /// </summary>
         /// <param name="queryIDList">A list of ID's that need to be queried</param>
         /// <returns>An Array of non-error records</returns>
-        public string []ListById(string queryIDList)
+        public void ListById()
         {
-            string []splitStringIdList = queryIDList.Split(' ');  //Split the different ID's being used
-            List<string> recordList = new List<string>();         //List of valid non-error ID's.
-            string QueryRecord = "";                              //Query Result of a given ID
+            List<string> RecordList = new List<string>();
+            int headerCount = ReadHeaderRec();
+            int id = 1;
+            int RRN = 0;
+            byte[] QueryRecord;                //Record that was returned
 
-            for (int i = 0; i < splitStringIdList.Length; i++)
+            for(int i = 0; i < headerCount;)
             {
-                QueryRecord = QueryByID(splitStringIdList[i]);
+                RRN = CalculateRRN(id++);
+                QueryRecord = ReadOneRecord(RRN);
 
-                //Check for query error
-                if(QueryRecord.Contains("Error") == false)
+                if(QueryRecord[0] != 0)
                 {
-                    recordList.Add(QueryRecord);
+                    RecordList.Add(FormatRecord(Encoding.UTF8.GetString(QueryRecord)));
+                    ++i;
                 }
+
+                
+
             }
 
-                return recordList.ToArray();
+
 
         }
+
 
         //---------------------------------------------------------------------------
         /// <summary>
@@ -286,6 +294,67 @@ namespace SharedClassLibrary
         }
 
 
+
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Reads the header that contains the amount of records inside
+        /// </summary>
+        /// <returns>Record amount number</returns>
+
+        private int ReadHeaderRec()
+        {
+            byte[] recordData = new byte[_sizeOfHeaderRec];
+
+            mainDataFile.Seek(0, SeekOrigin.Begin);
+            mainDataFile.Read(recordData, 0, recordData.Length);
+
+            return Convert.ToInt32(Encoding.UTF8.GetString(recordData));
+        }
+
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Formates the string to de aligned with its header columns
+        /// </summary>
+        /// <param name="record">record from main data</param>
+        /// <returns>formatted string ready to be used</returns>
+        private string FormatRecord(string record)
+        {
+            int stringPos = 0;
+
+            string id = record.Substring(stringPos, 3).Trim();
+            stringPos += 3;
+            string code = record.Substring(stringPos, 3).Trim();
+            stringPos += 3;
+            string name = record.Substring(stringPos, 17).Trim();
+            stringPos += 17;
+            string continent = record.Substring(stringPos, 11).Trim();
+            stringPos += 11;
+            string region = record.Substring(stringPos, 10).Trim();
+            stringPos += 10;
+            string surfaceArea = record.Substring(stringPos, 8).Trim();
+            stringPos += 8;
+            string yearOfIndep = record.Substring(stringPos, 5).Trim();
+            stringPos += 5;
+            string population = record.Substring(stringPos, 10).Trim();
+            stringPos += 10;
+            string lifeExpectancy = record.Substring(stringPos, 4).Trim();
+
+
+
+
+            string t = "[" + _id + "]".PadRight(3, ' ') +
+                        id.PadRight(4, ' ') +
+                        code.PadRight(5, ' ') +
+                        name.PadRight(20, ' ') +
+                        continent.PadRight(18) +
+                        region.PadRight(15, ' ') +
+                        surfaceArea.PadRight(15, ' ') +
+                        yearOfIndep.PadRight(9, ' ') +
+                        population.PadRight(13, ' ') +
+                        lifeExpectancy;
+
+            return t;
+        }
 
         //---------------------------------------------------------------------------
         /// <summary>
@@ -402,25 +471,6 @@ namespace SharedClassLibrary
         private void WriteOneRecord(char[] input)
         {
             mainDataFile.Write(Encoding.ASCII.GetBytes(input), 0, input.Length);
-        }
-
-        //--------------------------------------------------------------------------
-        /// <summary>
-        /// Appends to the log file
-        /// </summary>
-        /// <param name="msg">Message wanted to be displayed in the log file</param>
-        private void WriteToLog(string msg)
-        {
-            try
-            {
-                var logFile = new StreamWriter("Log.txt", true);
-                logFile.WriteLine(msg);
-                logFile.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
         }
 
     }
