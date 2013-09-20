@@ -242,6 +242,7 @@ namespace PrettyPrintUtility
         {
             StreamWriter logFile = new StreamWriter("Log.txt", true);
 
+            logFile.WriteLine("\n***************Pretty Print Start***************\n");
             logFile.WriteLine(FormatHeader());
 
             foreach (string s in RecordList)
@@ -249,7 +250,7 @@ namespace PrettyPrintUtility
                 logFile.WriteLine(s);
             }
 
-            logFile.WriteLine("**********End Of Pretty Print Utility**********");
+            logFile.WriteLine("\n**********End Of Pretty Print Utility**********\n");
 
             logFile.Close();
 

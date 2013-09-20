@@ -42,20 +42,25 @@ namespace SharedClassLibrary
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
         public MainData(UserInterface LogInterFace)
         {
+            //Calculate sizes for RandomAccess byte offset
+            _sizeOfHeaderRec = _headerRec.Length;
+            _sizeOfDataRec   = _id.Length + _code.Length + _name.Length + _continent.Length
+                               + _region.Length + _surfaceArea.Length + _yearOfIndep.Length
+                               + _population.Length + _lifeExpectancy.Length;
+
+
             //Open and create a new file
             fileName = "MainData.txt";
 
+            //Allow access to log file
             _LogFile = LogInterFace;
+
+            //Open or Create Main data file
             mainDataFile = new FileStream(fileName, FileMode.OpenOrCreate);
             _LogFile.WriteToLog("Opened " + fileName + " File");
 
-
-
-            //Calculate sizes for RandomAccess byte offset
-            _sizeOfHeaderRec =_headerRec.Length;
-            _sizeOfDataRec = _id.Length + _code.Length + _name.Length + _continent.Length 
-                             + _region.Length + _surfaceArea.Length +_yearOfIndep.Length 
-                             + _population.Length + _lifeExpectancy.Length;
+            //Get total records in file (Default is 0)
+            headerCount = ReadHeaderRec();
         }
 
         //**************************** PUBLIC SERVICE METHODS **********************
@@ -84,38 +89,6 @@ namespace SharedClassLibrary
 
             return true;
 
-        }
-
-
-        //---------------------------------------------------------------------------
-        /// <summary>
-        /// Returns a formatted record with RRN to be printed
-        /// </summary>
-        /// <param name="RRN">Record location</param>
-        /// <param name="WithRRN">Add RRN with string</param>
-        /// <returns>a formatted record that can be printed</returns>
-        public string GetFormattedRecord(int RRN, bool WithRRN)
-        {
-            byte  []record = ReadOneRecord(RRN);
-            string formatRecord = "";
-
-            if(record[0] != '\0')
-            {
-                if (WithRRN)
-                {
-                    formatRecord = string.Format("[{0}] {1}", RRN, Encoding.UTF8.GetString(record));
-                }
-                else
-                {
-                    formatRecord = Encoding.UTF8.GetString(record);
-                }
-            }
-            else
-            {
-                formatRecord = string.Format("[{0}] EMPTY", RRN);
-            }
-
-            return formatRecord;
         }
 
         //-------------------------------------------------------------------------
@@ -171,7 +144,6 @@ namespace SharedClassLibrary
         public void ListById()
         {
             byte[] QueryRecord;                //Record that was returned
-            int headerCount = ReadHeaderRec();
             int id = 1;
             int RRN = 0;
 
@@ -220,8 +192,13 @@ namespace SharedClassLibrary
                     string name = Encoding.UTF8.GetString(data)
                                             .Substring(_id.Length + _code.Length, _name.Length).Trim();
 
+                    //Apply null byte to record
                     mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
                     mainDataFile.WriteByte(0);
+
+                    //Subtract record count and write new header
+                    --headerCount;
+                    WriteHeaderRec();
 
                     _LogFile.WriteToLog("OK, " + name + "\t\tDeleted");
                 }
@@ -350,7 +327,25 @@ namespace SharedClassLibrary
             mainDataFile.Seek(0, SeekOrigin.Begin);
             mainDataFile.Read(recordData, 0, recordData.Length);
 
-            return Convert.ToInt32(Encoding.UTF8.GetString(recordData));
+
+            if(recordData[0] != 0)
+            {
+                return Convert.ToInt32(Encoding.UTF8.GetString(recordData));;
+            }
+
+
+            return 0;
+        }
+
+        //----------------------------------------------------------------------------------
+        /// <summary>
+        /// Writes the header record to the top of the file with current record count
+        /// </summary>
+        private void WriteHeaderRec()
+        {
+            mainDataFile.Seek(0, SeekOrigin.Begin);
+            _headerRec = headerCount.ToString().PadLeft(_headerRec.Length, '0').ToCharArray();
+            WriteOneRecord(_headerRec);
         }
 
         //------------------------------------------------------------------------------
@@ -461,10 +456,8 @@ namespace SharedClassLibrary
         /// <param name="byteOffSet">Where in the file to begin the writing process</param>
         private void WriteOneCountry(int byteOffSet)
         {
-            mainDataFile.Seek(0, SeekOrigin.Begin);
-            _headerRec = headerCount.ToString().PadLeft(_headerRec.Length, '0').ToCharArray();
+            WriteHeaderRec();
 
-            WriteOneRecord(_headerRec);
             if(mainDataFile.Length < byteOffSet)
                 mainDataFile.SetLength(byteOffSet);
 
