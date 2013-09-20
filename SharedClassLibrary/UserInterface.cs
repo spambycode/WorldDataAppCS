@@ -14,6 +14,7 @@ namespace SharedClassLibrary
         //**************************** PRIVATE DECLARATIONS ************************
         private StreamReader transDataFile;
         private StreamWriter logFile;
+        private string TransFileName;
 
         //**************************** PUBLIC GET/SET METHODS **********************
 
@@ -22,6 +23,7 @@ namespace SharedClassLibrary
         public UserInterface(bool OpenLog, bool OpenTrans, string TransFileName = "Transdata.txt")
         {
             Console.WriteLine("OK, UserInterface object created");
+            this.TransFileName = TransFileName;
 
             if(OpenLog)
             {
@@ -32,7 +34,7 @@ namespace SharedClassLibrary
             if (OpenTrans)
             {
                 transDataFile = new StreamReader(TransFileName);
-                WriteToLog("Trans Data File Open");
+                WriteToLog(TransFileName + " File Open");
             }
         }
 
@@ -93,11 +95,11 @@ namespace SharedClassLibrary
         /// </summary>
         /// <param name="CloseTransData">Trans data file</param>
         /// <param name="CloseLog">Close opened log file</param>
-        public void CloseFile(bool CloseLog, bool CloseTransData)
+        public void FinishUp(bool CloseLog, bool CloseTransData)
         {
             if(CloseTransData && transDataFile != null)
             {
-                WriteToLog("Trans Data File Closed");
+                WriteToLog(TransFileName + " File Closed");
                 transDataFile.Close();
                 transDataFile = null;
             }

@@ -28,27 +28,19 @@ namespace PrettyPrintUtility
     public class PrettyPrintUtility
     {
         static FileStream mainDataFile;
+        static List<string> RecordList;
         static int _sizeOfHeaderRec = 3;
         static int _sizeOfDataRec = 71;
-        static private string _id;               //ID of record
-        static private string _code;             //Country code
-        static private string _name;             //Name of country
-        static private string _continent;        //What continent the country is located
-        static private string _region;           //What region the country is located
-        static private string _surfaceArea;      //Size of the country
-        static private string _yearOfIndep;      //What year they went independent
-        static private string _population;       //Total population of the country
-        static private string _lifeExpectancy;   //The average time someone is alive in the country
-        static List<string> RecordList = new List<string>();
 
         public static void Main(string[] args)
         {
             if (File.Exists("MainData.txt"))
             {
+                RecordList = new List<string>();
                 mainDataFile = new FileStream("MainData.txt", FileMode.Open);
                 HandleDataFile();
                 PrintResults();
-                CloseFile();
+                FinishUp();
 
             }
             else
@@ -58,7 +50,7 @@ namespace PrettyPrintUtility
           
         }
 
-        private static void CloseFile()
+        private static void FinishUp()
         {
             mainDataFile.Close();
         }
@@ -105,18 +97,6 @@ namespace PrettyPrintUtility
             return id;
         }
 
-        //--------------------------------------------------------------------------
-        /// <summary>
-        /// Gives the RRN to where the information needs to be stored to stored or 
-        /// queried
-        /// </summary>
-        /// <param name="id">Id to calculate the RRN of the document</param>
-        /// <returns>The RRN of the main data file</returns>
-        private static int CalculateRRN(string id)
-        {
-            return CalculateRRN(Int32.Parse(id));
-        }
-
         //---------------------------------------------------------------------------
         /// <summary>
         /// Obtain the offset to where the file pointer needs to point
@@ -143,8 +123,6 @@ namespace PrettyPrintUtility
 
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
             mainDataFile.Read(recordData, 0, recordData.Length);
-
-
 
             return recordData;
         }
@@ -173,41 +151,41 @@ namespace PrettyPrintUtility
         /// <returns>formatted string ready to be used</returns>
         private static string FormatRecord(string record)
         {
+            string id;               //ID of record
+            string code;             //Country code
+            string name;             //Name of country
+            string continent;        //What continent the country is located
+            string region;           //What region the country is located
+            string surfaceArea;      //Size of the country
+            string yearOfIndep;      //What year they went independent
+            string population;       //Total population of the country
+            string lifeExpectancy;   //The average time someone is alive in the country
             int stringPos = 0;
 
-            _id             = record.Substring(stringPos, 3).Trim();
-            stringPos       += 3;
-            _code           = record.Substring(stringPos, 3).Trim();
-            stringPos       += 3;
-            _name           = record.Substring(stringPos, 17).Trim();
-            stringPos       += 17;
-            _continent      = record.Substring(stringPos, 11).Trim();
-            stringPos       += 11;
-            _region         = record.Substring(stringPos, 10).Trim();
-            stringPos       += 10;
-            _surfaceArea    = record.Substring(stringPos, 8).Trim();
-            stringPos       += 8;
-            _yearOfIndep    = record.Substring(stringPos, 5).Trim();
-            stringPos       += 5;
-            _population     = record.Substring(stringPos, 10).Trim();
-            stringPos       += 10;
-            _lifeExpectancy = record.Substring(stringPos, 4).Trim();
+            //Split record
+            id             = GetSubStringRec(record, 3, ref stringPos);
+            code           = GetSubStringRec(record, 3, ref stringPos);
+            name           = GetSubStringRec(record, 17, ref stringPos);
+            continent      = GetSubStringRec(record, 11, ref stringPos);
+            region         = GetSubStringRec(record, 10, ref stringPos);
+            surfaceArea    = GetSubStringRec(record, 8, ref stringPos);
+            yearOfIndep    = GetSubStringRec(record, 5, ref stringPos); 
+            population     = GetSubStringRec(record, 10, ref stringPos);
+            lifeExpectancy = GetSubStringRec(record, 4, ref stringPos);
 
 
 
 
-            string t = "[" + _id + "]".PadRight(3, ' ') +
-                        _id.PadRight(4, ' ') +
-                        _code.PadRight(5, ' ')+
-                        _name.PadRight(20, ' ') +
-                        _continent.PadRight(18)+
-                        _region.PadRight(15, ' ') +
-                        _surfaceArea.PadRight(15, ' ') +
-                        _yearOfIndep.PadRight(9, ' ') +
-                        _population.PadRight(13, ' ') +
-                        _lifeExpectancy;
-
-            return t;
+            return   "[" + id + "]".PadRight(3, ' ') +
+                        id.PadRight(4, ' ') +
+                        code.PadRight(5, ' ')+
+                        name.PadRight(20, ' ') +
+                        continent.PadRight(18)+
+                        region.PadRight(15, ' ') +
+                        surfaceArea.PadRight(15, ' ') +
+                        yearOfIndep.PadRight(9, ' ') +
+                        population.PadRight(13, ' ') +
+                        lifeExpectancy;
         }
 
 
@@ -219,7 +197,7 @@ namespace PrettyPrintUtility
         private static string FormatHeader()
         {
 
-            string t = "[RRN]".PadRight(7, ' ') +
+            return      "[RRN]".PadRight(7, ' ') +
                         "ID".PadRight(4, ' ') +
                         "CODE".PadRight(5, ' ') +
                         "NAME".PadRight(20, ' ') +
@@ -229,10 +207,23 @@ namespace PrettyPrintUtility
                         "INDEP".PadRight(9, ' ') +
                         "POPULATION".PadRight(13, ' ') +
                         "L.EXP";
-
-            return t;
         }
 
+        //------------------------------------------------------------------------------
+        /// <summary>
+        /// Split a string to get a necessary data field
+        /// </summary>
+        /// <param name="record">Full recorded wanted to split</param>
+        /// <param name="recordlength">Length of desired record</param>
+        /// <param name="strPosition">Where to start chopping</param>
+        /// <returns>new sub-string record</returns>
+        private static string GetSubStringRec(string record, int subRecordlength, ref int strPosition)
+        {
+            string subrec = record.Substring(strPosition, subRecordlength).Trim();
+            strPosition += subRecordlength;
+
+            return subrec;
+        }
 
         //------------------------------------------------------------------------------
         /// <summary>

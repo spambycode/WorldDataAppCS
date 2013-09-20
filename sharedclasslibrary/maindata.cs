@@ -95,7 +95,7 @@ namespace SharedClassLibrary
         /// <summary>
         /// Closes the main data file 
         /// </summary>
-        public void CloseFile()
+        public void FinishUp()
         {
             mainDataFile.Close();
             _LogFile.WriteToLog("Closed " + fileName + " File");
@@ -219,11 +219,10 @@ namespace SharedClassLibrary
         /// Inserts a new record into the file
         /// </summary>
         /// <param name="record">A string with CSV style record</param>
-        /// <returns>true if value was stored correctly without error</returns>
         public void InsertRecord(string record)
         {
 
-            var recordSplit = record.Split(',');
+            /*var recordSplit = record.Split(',');
 
             //Must of at least 9 records for everything to work
             if(recordSplit.Length >= 9)
@@ -235,7 +234,10 @@ namespace SharedClassLibrary
             else
             {
                 _LogFile.WriteToLog("IN : Wrong input was found");
-            }
+            }*/
+
+            _LogFile.WriteToLog("*IN: Is not operational at this time");
+
 
         }
 
@@ -438,16 +440,26 @@ namespace SharedClassLibrary
         /// <returns>A string based on its RRN location in file</returns>
         private byte []ReadOneRecord(int RRN)
         {
-
-            byte[] recordData = new byte[_sizeOfDataRec];
             int byteOffSet    = CalculateByteOffSet(RRN);
 
             mainDataFile.Seek(byteOffSet, SeekOrigin.Begin);
+
+            return ReadOneRecord();
+        }
+
+        //----------------------------------------------------------------------------
+        /// <summary>
+        /// Reads one record at its current position in the file stream.
+        /// </summary>
+        /// <returns>Array of the record</returns>
+        private byte[] ReadOneRecord()
+        {
+            byte[] recordData = new byte[_sizeOfDataRec];
+
             mainDataFile.Read(recordData, 0, recordData.Length);
 
             return recordData;
         }
-
 
         //--------------------------------------------------------------------------
         /// <summary>

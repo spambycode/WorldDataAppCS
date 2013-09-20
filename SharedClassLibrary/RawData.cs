@@ -89,7 +89,7 @@ namespace SharedClassLibrary
             return true;
         }
 
-        public void CloseFile()
+        public void FinishUp()
         {
             rawDataFile.Close();
             logFile.WriteToLog("Closed " + filename + " file");

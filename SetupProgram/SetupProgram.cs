@@ -56,7 +56,7 @@ namespace SetupProgram
             }
             else
             {
-                fileNameSuffix = "";
+                fileNameSuffix = "Just26";
             }
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -66,6 +66,7 @@ namespace SetupProgram
             SharedClassLibrary.RawData RD = new RawData(UI, FileName);
             SharedClassLibrary.MainData MD = new MainData(UI);
 
+            UI.WriteToLog("\n***************Setup App Start***************\n");
             while (RD.ReadOneCountry() != true)
             {
                 if(MD.StoreOneCountry(RD))
@@ -83,10 +84,10 @@ namespace SetupProgram
             UI.WriteToLog(string.Format("Setup complete: {0} Total records processed ({1} Successes and {2} Errors) ", 
                             RecordCount, RecordSuccess, RecordError));
 
-            
-            MD.CloseFile();
-            RD.CloseFile();
-            UI.CloseFile(true, false);
+            UI.WriteToLog("\n***************Setup App END***************\n");
+            MD.FinishUp();
+            RD.FinishUp();
+            UI.FinishUp(true, false);
 
 
 

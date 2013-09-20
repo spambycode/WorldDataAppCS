@@ -36,6 +36,8 @@ namespace UserApp
             SharedClassLibrary.UserInterface UI = new UserInterface(true, true, transFileName);
             SharedClassLibrary.MainData MD = new MainData(UI);
 
+            UI.WriteToLog("\n***************User App Start***************\n");
+
             while(UI.GetOneTransdata(out command) == false)
             {
                 UI.WriteToLog(command);
@@ -64,9 +66,10 @@ namespace UserApp
 
             }
 
-            MD.CloseFile();
+            MD.FinishUp();
             UI.WriteToLog(string.Format("UserApp completed: {0} transactions handled", CommandCount));
-            UI.CloseFile(true, true);
+            UI.WriteToLog("\n***************User App END***************\n");
+            UI.FinishUp(true, true);
 
 
         }
