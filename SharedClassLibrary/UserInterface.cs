@@ -1,7 +1,7 @@
-﻿/* PROJECT: WorldDataAppCS (C#)         CLASS: UserInterface
- * AUTHOR:
- * FILES ACCESSED:
- * DESCRIPTION: 
+﻿/* PROJECT: Asign 1 (C#)         CLASS: UserInterface
+ * AUTHOR:George Karaszi
+ * FILES ACCESSED: TransData*.txt and log.txt
+ * DESCRIPTION: Opens and writes to log file. Opens and processes transdata
  *******************************************************************************/
 
 using System;

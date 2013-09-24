@@ -1,4 +1,6 @@
-﻿
+﻿/* PROJECT:  Asign 1 (C#)            PROGRAM: UserApp
+ * AUTHOR: George Karaszi   
+ *******************************************************************************/
 
 using System;
 

@@ -1,8 +1,5 @@
-﻿/* PROJECT: WorldDataAppCS (C#)         CLASS: RawData
- * AUTHOR:
- * FILES ACCESSED:
- * FILE STRUCTURE:  
- * DESCRIPTION:   
+﻿/* PROJECT:  Asign 1 (C#)            PROGRAM: RawData class
+ * AUTHOR: George Karaszi   
  *******************************************************************************/
 
 using System;
@@ -32,6 +29,10 @@ namespace SharedClassLibrary
 
         //**************************** PUBLIC CONSTRUCTOR(S) ***********************
 
+        /// <summary>
+        /// Assign raw data via constructor.
+        /// </summary>
+        /// <param name="recordSplit">Split fields of record</param>
         public RawData(string[] recordSplit)
         {
             ID = recordSplit[0];
@@ -62,7 +63,10 @@ namespace SharedClassLibrary
         }
         //**************************** PUBLIC SERVICE METHODS **********************
 
-
+        /// <summary>
+        /// Reads one country from the rawdata file.
+        /// </summary>
+        /// <returns>EOF status</returns>
         public bool ReadOneCountry()
         {
             if (rawDataFile.EndOfStream != true)
@@ -89,6 +93,9 @@ namespace SharedClassLibrary
             return true;
         }
 
+        /// <summary>
+        /// Close opened files
+        /// </summary>
         public void FinishUp()
         {
             rawDataFile.Close();

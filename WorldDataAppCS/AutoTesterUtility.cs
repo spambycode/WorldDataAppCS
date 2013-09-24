@@ -1,18 +1,6 @@
-﻿/* NOTE:  NOT USED IN ASGN 1
- * */
-
-/* PROJECT:  WorldDataAppCS (C#)            PROGRAM: AutoTesterUtility
- * AUTHOR:  Kaminski/CS3310
- * PROGRAMS ACCESSED:  SetupProgram, UserApp, PrettyPrintUtility
- * OOP CLASSES USED:  none - this program is just a developer utility program
- *      and doesn't use the OOP paradigm
- * FILES ACCESSED:  4 output files from this project (using suffix for *):
- *      Log.txt, MainData*.bin, NameIndexBackup*.bin, codeIndexBackup*.bin
- * DESCRIPTION:  Utility program which aids developer to automate testing of the
- *      project with various test data sets.  It deletes output files from
- *      previous runs and executes the 3 programs with various test files
- *      (and N's) as parameters when calling those programs' Main methods.
- ******************************************************************************/
+﻿/* PROJECT:  Asign 1 (C#)            PROGRAM: AutoTesterUtility
+ * AUTHOR: George Karaszi   
+ *******************************************************************************/
 
 using System;
 using System.IO;

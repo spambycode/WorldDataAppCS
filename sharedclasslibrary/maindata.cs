@@ -1,12 +1,6 @@
-﻿/* NOTE:  NOT USED IN ASGN 1
- * */
-
-/* PROJECT: WorldDataAppCS (C#)         CLASS: MainData
- * AUTHOR:
- * FILES ACCESSED:
- * FILE STRUCTURE:
- * DESCRIPTION:
-*******************************************************************************/
+﻿/* PROJECT:  Asign 1 (C#)            PROGRAM: MainData class
+ * AUTHOR: George Karaszi   
+ *******************************************************************************/
 
 using System;
 using System.IO;
